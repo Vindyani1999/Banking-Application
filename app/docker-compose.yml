@@ -6,7 +6,7 @@ services:
     build: ./frontend
     ports:
       - 3000:3000
-    platform: linux/x86_64
+    platform: windows/amd64
     working_dir: /app-frontend
     depends_on:
       backend:
@@ -14,7 +14,7 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:3001
     healthcheck:
-      test: ["CMD", "lsof", "-t", "-i:3000"]
+      test: ["CMD", "netstat", "-an", "|", "find", "\"LISTENING\"", "|", "find", "\"3000\""]
       timeout: 10s
       retries: 5
 
@@ -23,7 +23,7 @@ services:
     build: ./backend
     ports:
       - 3001:3001
-    platform: linux/x86_64
+    platform: windows/amd64
     working_dir: /app-backend
     depends_on:
       db:
@@ -36,13 +36,14 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
     healthcheck:
-      test: ["CMD", "lsof", "-t", "-i:3001"]
+      test: ["CMD", "netstat", "-an", "|", "find", "\"LISTENING\"", "|", "find", "\"3001\""]
       timeout: 10s
       retries: 5
+
   db:
     container_name: ng_db
     image: postgres:15.1
-    platform: linux/x86_64
+    platform: windows/amd64
     ports:
       - 3002:5432
     user: postgres
